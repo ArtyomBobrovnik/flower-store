@@ -11,9 +11,53 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Flower {
-  id            Int    @id @default(autoincrement())
+model Material {
+  id            Int                              @id @default(autoincrement())
+  category      MaterialCategory
   name          String
   image         String
   stockQuantity Int
+  availableFor  ArrangementVariationToMaterial[]
+}
+
+model ArrangementVariation {
+  id                 Int                              @id @default(autoincrement())
+  price              Int
+  category           ArrangementCategory
+  size               ArrangementSize
+  materialUniqueness MaterialUniqueness
+  availableMaterials ArrangementVariationToMaterial[]
+
+  @@unique([category, size, materialUniqueness])
+}
+
+model ArrangementVariationToMaterial {
+  variation   ArrangementVariation @relation(fields: [variationId], references: [id], onDelete: Cascade)
+  variationId Int
+  material    Material             @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  materialId  Int
+
+  @@id([variationId, materialId])
+  @@index([variationId, materialId])
+}
+
+enum MaterialUniqueness {
+  REGULAR
+  UNIQUUE
+  RARE
+}
+
+enum MaterialCategory {
+  FLOWER
+}
+
+enum ArrangementSize {
+  S
+  M
+  L
+  XL
+}
+
+enum ArrangementCategory {
+  BOUQUET
 }
